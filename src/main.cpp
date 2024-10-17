@@ -29,7 +29,7 @@ int main()
     while (!WindowShouldClose())
     {
         // Update
-        if (IsKeyDown(KEY_D))
+        if (IsKeyDown(KEY_RIGHT))
         {
             playerPosition.x += playerSpeed;
             if (frameRec.width < 0)
@@ -37,7 +37,7 @@ int main()
                 frameRec.width = -frameRec.width;
             }
         }
-        if (IsKeyDown(KEY_A))
+        if (IsKeyDown(KEY_LEFT))
         {
             playerPosition.x -= playerSpeed;
             if (frameRec.width > 0)
@@ -46,8 +46,8 @@ int main()
             }
         }
 
-        if (IsKeyDown(KEY_W)) playerPosition.y -= playerSpeed;
-        if (IsKeyDown(KEY_S)) playerPosition.y += playerSpeed;
+        if (IsKeyDown(KEY_UP)) playerPosition.y -= playerSpeed;
+        if (IsKeyDown(KEY_DOWN)) playerPosition.y += playerSpeed;
 
         if (IsKeyPressed(KEY_Q)) camera.zoom += 1.0f;
         if (IsKeyPressed(KEY_E)) camera.zoom -= 1.0f;
