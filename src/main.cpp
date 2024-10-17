@@ -1,27 +1,38 @@
 #include "raylib.h"
-#include "rlgl.h"
+
+typedef struct Player
+{
+    Vector2 position;
+    Vector2 speed;
+    Texture2D idle;
+} Player;
+
+static const int screenWidth = 800;
+static const int screenHeight = 600;
+
+static int framesCounter = 0;
+
+static Player player = {0};
+static Camera2D camera = {0};
 
 int main()
 {
     // Initialization
-    const int screenWidth = 800;
-    const int screenHeight = 600;
     InitWindow(screenWidth, screenHeight, "Hello World");
     // Load textures
-    Texture2D player = LoadTexture("../assets/human/idle/base_idle_strip9.png");
-    SetTextureFilter(player, RL_TEXTURE_FILTER_NEAREST);
-    int playerFrameWidth = player.width / 9;
-    int playerFrameHeight = player.height;
-    Vector2 playerPosition = {350.0f, 300.0f};
+    player.idle = LoadTexture("../resources/human/idle/base_idle_strip9.png");
+    player.position = {350.0f, 300.0f};
+
+    int playerFrameWidth = player.idle.width / 9;
+    int playerFrameHeight = player.idle.height;
+
     Rectangle frameRec = {0.0f, 0.0f, (float)playerFrameWidth, (float)playerFrameHeight};
 
     float playerSpeed = 4;
-    int framesCounter = 0;
     int framesSpeed = 10;
     int currentFrame = 0;
 
-    Camera2D camera = {0};
-    camera.target = (Vector2){playerPosition.x + 20.0f, playerPosition.y + 20.0f};
+    camera.target = (Vector2){player.position.x + 20.0f, player.position.y + 20.0f};
     camera.offset = (Vector2){screenWidth / 2.0f, screenHeight / 2.0f};
     camera.zoom = 2.0f;
 
@@ -31,7 +42,7 @@ int main()
         // Update
         if (IsKeyDown(KEY_RIGHT))
         {
-            playerPosition.x += playerSpeed;
+            player.position.x += playerSpeed;
             if (frameRec.width < 0)
             {
                 frameRec.width = -frameRec.width;
@@ -39,22 +50,20 @@ int main()
         }
         if (IsKeyDown(KEY_LEFT))
         {
-            playerPosition.x -= playerSpeed;
+            player.position.x -= playerSpeed;
             if (frameRec.width > 0)
             {
                 frameRec.width = -frameRec.width;
             }
         }
-
-        if (IsKeyDown(KEY_UP)) playerPosition.y -= playerSpeed;
-        if (IsKeyDown(KEY_DOWN)) playerPosition.y += playerSpeed;
+        if (IsKeyDown(KEY_UP)) player.position.y -= playerSpeed;
+        if (IsKeyDown(KEY_DOWN)) player.position.y += playerSpeed;
 
         if (IsKeyPressed(KEY_Q)) camera.zoom += 1.0f;
         if (IsKeyPressed(KEY_E)) camera.zoom -= 1.0f;
         if (IsKeyPressed(KEY_R)) camera.zoom = 1.0f;
 
-
-        camera.target = (Vector2){playerPosition.x + 20.0f, playerPosition.y + 20.0f};
+        camera.target = (Vector2){player.position.x + 20.0f, player.position.y + 20.0f};
         if (camera.zoom > 3.0f) camera.zoom = 3.0f;
         if (camera.zoom < 1.0f) camera.zoom = 1.0f;
 
@@ -72,16 +81,15 @@ int main()
         ClearBackground(RAYWHITE);
 
         BeginMode2D(camera);
-        DrawTextureRec(player, frameRec, playerPosition, WHITE);
+        DrawTextureRec(player.idle, frameRec, player.position, WHITE);
         DrawText("Hello World!", 350, 300, 20, LIGHTGRAY);
         EndMode2D();
 
         DrawFPS(10, 10);
         EndDrawing();
     }
-
     // De-Initialization
-    UnloadTexture(player);
+    UnloadTexture(player.idle);
 
     CloseWindow();
     return 0;
