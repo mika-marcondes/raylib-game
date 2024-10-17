@@ -4,11 +4,15 @@ typedef struct Player
 {
     Vector2 position;
     Vector2 speed;
-    Texture2D idle;
+    Texture2D texture;
+    Color color;
+
+    int currentFrame;
+    Rectangle frameRec;
 } Player;
 
-static const int screenWidth = 800;
-static const int screenHeight = 600;
+static constexpr int screenWidth = 800;
+static constexpr int screenHeight = 600;
 
 static int framesCounter = 0;
 
@@ -20,13 +24,11 @@ int main()
     // Initialization
     InitWindow(screenWidth, screenHeight, "Hello World");
     // Load textures
-    player.idle = LoadTexture("../resources/human/idle/base_idle_strip9.png");
+    player.texture = LoadTexture("../resources/human/idle/base_idle_strip9.png");
     player.position = {350.0f, 300.0f};
-
-    int playerFrameWidth = player.idle.width / 9;
-    int playerFrameHeight = player.idle.height;
-
-    Rectangle frameRec = {0.0f, 0.0f, (float)playerFrameWidth, (float)playerFrameHeight};
+    player.currentFrame = player.texture.width / 9;
+    player.frameRec = {0.0f, 0.0f, (float)player.currentFrame, (float)player.texture.height};
+    player.color = WHITE;
 
     float playerSpeed = 4;
     int framesSpeed = 10;
@@ -37,23 +39,24 @@ int main()
     camera.zoom = 2.0f;
 
     SetTargetFPS(60);
+
     while (!WindowShouldClose())
     {
         // Update
         if (IsKeyDown(KEY_RIGHT))
         {
             player.position.x += playerSpeed;
-            if (frameRec.width < 0)
+            if (player.frameRec.width < 0)
             {
-                frameRec.width = -frameRec.width;
+                player.frameRec.width = -player.frameRec.width;
             }
         }
         if (IsKeyDown(KEY_LEFT))
         {
             player.position.x -= playerSpeed;
-            if (frameRec.width > 0)
+            if (player.frameRec.width > 0)
             {
-                frameRec.width = -frameRec.width;
+                player.frameRec.width = -player.frameRec.width;
             }
         }
         if (IsKeyDown(KEY_UP)) player.position.y -= playerSpeed;
@@ -73,7 +76,7 @@ int main()
             framesCounter = 0;
             currentFrame++;
             if (currentFrame > 8) currentFrame = 0;
-            frameRec.x = (float)currentFrame * (float)playerFrameWidth;
+            player.frameRec.x = (float)currentFrame * (float)player.currentFrame;
         }
 
         // Draw
@@ -81,7 +84,7 @@ int main()
         ClearBackground(RAYWHITE);
 
         BeginMode2D(camera);
-        DrawTextureRec(player.idle, frameRec, player.position, WHITE);
+        DrawTextureRec(player.texture, player.frameRec, player.position, player.color);
         DrawText("Hello World!", 350, 300, 20, LIGHTGRAY);
         EndMode2D();
 
@@ -89,7 +92,7 @@ int main()
         EndDrawing();
     }
     // De-Initialization
-    UnloadTexture(player.idle);
+    UnloadTexture(player.texture);
 
     CloseWindow();
     return 0;
