@@ -82,12 +82,28 @@ int main()
             player.texture = animIdle;
             player.frameSize = 9;
         }
-        if (IsKeyDown(KEY_UP)){
+        if (IsKeyDown(KEY_UP))
+        {
             player.position.y -= playerSpeed;
             player.texture = animRun;
             player.frameSize = 8;
         }
-        if (IsKeyDown(KEY_DOWN)) player.position.y += playerSpeed;
+        if (IsKeyReleased(KEY_UP))
+        {
+            player.texture = animIdle;
+            player.frameSize = 9;
+        }
+        if (IsKeyDown(KEY_DOWN))
+        {
+            player.position.y += playerSpeed;
+            player.texture = animRun;
+            player.frameSize = 8;
+        }
+        if (IsKeyReleased(KEY_DOWN))
+        {
+            player.texture = animIdle;
+            player.frameSize = 9;
+        }
 
         if (IsKeyPressed(KEY_Q)) camera.zoom += 1.0f;
         if (IsKeyPressed(KEY_E)) camera.zoom -= 1.0f;
