@@ -12,6 +12,7 @@ typedef struct Player
     Rectangle frameRec;
 } Player;
 
+
 static constexpr int screenWidth = 800;
 static constexpr int screenHeight = 600;
 
@@ -34,17 +35,12 @@ int main()
 {
     // Initialization
     InitWindow(screenWidth, screenHeight, "Hello World");
+    Texture2D animRun = LoadTexture("../resources/human/base_run_strip8.png");
+    Texture2D animIdle = LoadTexture("../resources/human/base_idle_strip9.png");
     InitPlayer();
-    // Load textures
-    // player.textureIdle = LoadTexture("../resources/human/base_idle_strip9.png");
-    // player.textureRun = LoadTexture("../resources/human/base_run_strip8.png");
-    // player.position = {350.0f, 300.0f};
-    // player.frameCurrent = player.textureIdle.width / 9;
-    // player.frameRec = {0.0f, 0.0f, (float)player.frameCurrent, (float)player.textureIdle.height};
-    // player.color = WHITE;
 
     float playerSpeed = 4;
-    int framesSpeed = 10;
+    int framesSpeed = 14;
     int currentFrame = 0;
 
     camera.target = (Vector2){player.position.x + 20.0f, player.position.y + 20.0f};
@@ -59,20 +55,38 @@ int main()
         if (IsKeyDown(KEY_RIGHT))
         {
             player.position.x += playerSpeed;
+            player.texture = animRun;
+            player.frameSize = 8;
             if (player.frameRec.width < 0)
             {
                 player.frameRec.width = -player.frameRec.width;
             }
         }
+        if (IsKeyReleased(KEY_RIGHT))
+        {
+            player.texture = animIdle;
+            player.frameSize = 9;
+        }
         if (IsKeyDown(KEY_LEFT))
         {
             player.position.x -= playerSpeed;
+            player.texture = animRun;
+            player.frameSize = 8;
             if (player.frameRec.width > 0)
             {
                 player.frameRec.width = -player.frameRec.width;
             }
         }
-        if (IsKeyDown(KEY_UP)) player.position.y -= playerSpeed;
+        if (IsKeyReleased(KEY_LEFT))
+        {
+            player.texture = animIdle;
+            player.frameSize = 9;
+        }
+        if (IsKeyDown(KEY_UP)){
+            player.position.y -= playerSpeed;
+            player.texture = animRun;
+            player.frameSize = 8;
+        }
         if (IsKeyDown(KEY_DOWN)) player.position.y += playerSpeed;
 
         if (IsKeyPressed(KEY_Q)) camera.zoom += 1.0f;
@@ -88,7 +102,7 @@ int main()
         {
             framesCounter = 0;
             currentFrame++;
-            if (currentFrame > 8) currentFrame = 0;
+            if (currentFrame > player.frameSize - 1) currentFrame = 0;
             player.frameRec.x = (float)currentFrame * (float)player.frameCurrent;
         }
 
