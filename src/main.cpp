@@ -4,10 +4,11 @@ typedef struct Player
 {
     Vector2 position;
     Vector2 speed;
-    Texture2D texture;
     Color color;
+    Texture2D texture;
 
-    int currentFrame;
+    int frameSize;
+    int frameCurrent;
     Rectangle frameRec;
 } Player;
 
@@ -19,16 +20,28 @@ static int framesCounter = 0;
 static Player player = {0};
 static Camera2D camera = {0};
 
+void InitPlayer()
+{
+    player.texture = LoadTexture("../resources/human/base_idle_strip9.png");
+    player.position = Vector2(350.0f, 300.0f);
+    player.frameSize = 9;
+    player.frameCurrent = player.texture.width / player.frameSize;
+    player.frameRec = {0.0f, 0.0f, (float)player.frameCurrent, (float)player.texture.height};
+    player.color = WHITE;
+}
+
 int main()
 {
     // Initialization
     InitWindow(screenWidth, screenHeight, "Hello World");
+    InitPlayer();
     // Load textures
-    player.texture = LoadTexture("../resources/human/idle/base_idle_strip9.png");
-    player.position = {350.0f, 300.0f};
-    player.currentFrame = player.texture.width / 9;
-    player.frameRec = {0.0f, 0.0f, (float)player.currentFrame, (float)player.texture.height};
-    player.color = WHITE;
+    // player.textureIdle = LoadTexture("../resources/human/base_idle_strip9.png");
+    // player.textureRun = LoadTexture("../resources/human/base_run_strip8.png");
+    // player.position = {350.0f, 300.0f};
+    // player.frameCurrent = player.textureIdle.width / 9;
+    // player.frameRec = {0.0f, 0.0f, (float)player.frameCurrent, (float)player.textureIdle.height};
+    // player.color = WHITE;
 
     float playerSpeed = 4;
     int framesSpeed = 10;
@@ -76,7 +89,7 @@ int main()
             framesCounter = 0;
             currentFrame++;
             if (currentFrame > 8) currentFrame = 0;
-            player.frameRec.x = (float)currentFrame * (float)player.currentFrame;
+            player.frameRec.x = (float)currentFrame * (float)player.frameCurrent;
         }
 
         // Draw
