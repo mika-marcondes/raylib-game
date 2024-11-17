@@ -1,58 +1,75 @@
 #include "raylib.h"
+#include "raymath.h"
 
-#include <random>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+using namespace std;
 
 static constexpr int screenWidth = 800;
 static constexpr int screenHeight = 600;
 
-class Walker {
-public:
-  int x;
-  int y;
-
-  void Setup() {
-    this->x = screenWidth / 2;
-    this->y = screenHeight / 2;
-  }
-
-  void Step() {
-    int min = 0;
-    int max = 3;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution distrib(min, max);
-
-    int choice = distrib(gen);
-
-    if (choice == 0) {
-      this->x++;
-    } else if (choice == 1) {
-      this->x--;
-    } else if (choice == 2) {
-      this->y++;
-    } else {
-      this->y--;
-    }
-  }
-
-  void Draw() const { DrawCircle(this->x, this->y, 20, BLACK); }
+struct Circle {
+  float x, y;
+  float radius;
+  Color color;
 };
 
 int main() {
   // Initialization
-  Walker walker;
   InitWindow(screenWidth, screenHeight, "Hello World");
-  walker.Setup();
+
   SetTargetFPS(60);
+
+  srand(time(nullptr));
+
+  vector<Circle> trail;
+
+  Circle walker = {
+      static_cast<float>(screenWidth / 2),
+      static_cast<float>(screenHeight / 2),
+      10,
+      BLACK,
+  };
+
+  float timeElapsed = 0.0f;
+  constexpr float circleSpawnInterval = 0.2f;
+  constexpr float stepSize = 20.0f;
 
   while (!WindowShouldClose()) {
     // Update
-    walker.Step();
+    timeElapsed += GetFrameTime();
+
+    if (timeElapsed >= circleSpawnInterval) {
+      timeElapsed = 0.0f;
+
+      trail.push_back(walker);
+
+      switch (int direction = rand() % 4) {
+      case 0:
+        walker.y -= stepSize;
+        break;
+      case 1:
+        walker.x += stepSize;
+        break;
+      case 2:
+        walker.y += stepSize;
+        break;
+      case 3:
+        walker.x -= stepSize;
+        break;
+      }
+
+      walker.x = Clamp(walker.x, walker.radius, screenWidth - walker.radius);
+      walker.y = Clamp(walker.y, walker.radius, screenHeight - walker.radius);
+    }
     // Draw
     BeginDrawing();
+    for (const Circle &circle : trail) {
+      DrawCircle(circle.x, circle.y, circle.radius, circle.color);
+    }
+    DrawCircle(walker.x, walker.y, walker.radius, walker.color);
     ClearBackground(RAYWHITE);
-    walker.Draw();
     DrawText("Hello World!", 350, 300, 20, LIGHTGRAY);
     EndMode2D();
 
